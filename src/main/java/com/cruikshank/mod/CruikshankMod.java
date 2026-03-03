@@ -1,6 +1,7 @@
 package com.cruikshank.mod;
 
 import com.cruikshank.mod.sound.ModSounds;
+import com.cruikshank.mod.spell.SpellHandler;
 import com.cruikshank.mod.world.CruikshankFlatChunkGenerator;
 import com.cruikshank.mod.world.LosAngelesChunkGenerator;
 import com.cruikshank.mod.world.SuperflatChunkGenerator;
@@ -60,6 +61,7 @@ public class CruikshankMod
         CREATIVE_MODE_TABS.register(modEventBus);
 
         MinecraftForge.EVENT_BUS.register(this);
+        MinecraftForge.EVENT_BUS.register(new SpellHandler());
 
         CHUNK_GENERATORS.register(modEventBus);
 

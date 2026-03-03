@@ -1,5 +1,12 @@
 package com.cruikshank.mod;
 
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.level.Level;
+import net.minecraftforge.event.entity.player.PlayerEvent;
+import com.cruikshank.mod.world.CruikshankFlatChunkGenerator;
 import com.cruikshank.mod.world.CruikshankFlatChunkGenerator;
 import com.mojang.serialization.Codec;
 import net.minecraft.core.registries.Registries;
@@ -53,6 +60,9 @@ public class CruikshankMod
     static {
         CHUNK_GENERATORS.register("cruikshank_flat", () -> CruikshankFlatChunkGenerator.CODEC);
     }
+
+    public static final ResourceKey<Level> CRUIKSHANK_FLAT_DIM = ResourceKey.create(
+            Registries.DIMENSION, new ResourceLocation(MODID, "cruikshank_flat"));
 
     // Creates a new Block with the id "examplemod:example_block", combining the namespace and path
     public static final RegistryObject<Block> EXAMPLE_BLOCK = BLOCKS.register("example_block", () -> new Block(BlockBehaviour.Properties.of().mapColor(MapColor.STONE)));
@@ -135,6 +145,33 @@ public class CruikshankMod
             // Some client setup code
             LOGGER.info("CRUIKSHANK: CLIENT SETUP");
             LOGGER.info("MINECRAFT NAME >> {}", Minecraft.getInstance().getUser().getName());
+        }
+    }
+
+    @SubscribeEvent
+    public void onPlayerRespawn(PlayerEvent.PlayerRespawnEvent event) {
+        if (event.getEntity() instanceof ServerPlayer player) {
+            redirectToCruikshankFlat(player);
+        }
+    }
+
+    @SubscribeEvent
+    public void onPlayerLogin(PlayerEvent.PlayerLoggedInEvent event) {
+        if (event.getEntity() instanceof ServerPlayer player) {
+            redirectToCruikshankFlat(player);
+        }
+    }
+
+    private void redirectToCruikshankFlat(ServerPlayer player) {
+        // Skip if current world already uses our generator (World Type approach)
+        if (player.serverLevel().getChunkSource().getGenerator() instanceof CruikshankFlatChunkGenerator) {
+            return;
+        }
+        ServerLevel targetLevel = player.server.getLevel(CRUIKSHANK_FLAT_DIM);
+        if (targetLevel != null) {
+            LOGGER.info("Cruikshank: redirecting player to flat world");
+            player.teleportTo(targetLevel, player.getX(), 60, player.getZ(),
+                    player.getYRot(), player.getXRot());
         }
     }
 }

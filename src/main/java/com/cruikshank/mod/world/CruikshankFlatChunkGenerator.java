@@ -1,5 +1,11 @@
 package com.cruikshank.mod.world;
 
+import net.minecraft.core.Holder;
+import net.minecraft.core.HolderSet;
+import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.levelgen.GenerationStep;
+import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import com.mojang.logging.LogUtils;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -145,12 +151,33 @@ public class CruikshankFlatChunkGenerator extends ChunkGenerator {
     @Override
     public void applyBiomeDecoration(WorldGenLevel level, ChunkAccess chunk,
                                      StructureManager structureManager) {
-        // No trees, flowers, ores, etc.
+        /*
+        // Trees, flowers, but no ores
+        ChunkPos chunkPos = chunk.getPos();
+        BlockPos origin = new BlockPos(chunkPos.getMinBlockX(), 0, chunkPos.getMinBlockZ());
+
+        Holder<Biome> biome = level.getBiome(origin.offset(8, 0, 8));
+        List<HolderSet<PlacedFeature>> featuresByStep = biome.value().getGenerationSettings().features();
+
+        // Only apply VEGETAL_DECORATION (trees, flowers, grass) — skip ores, lakes, etc.
+        int vegetalIndex = GenerationStep.Decoration.VEGETAL_DECORATION.ordinal();
+        if (vegetalIndex < featuresByStep.size()) {
+            for (Holder<PlacedFeature> feature : featuresByStep.get(vegetalIndex)) {
+                try {
+                    feature.value().place(level, this, level.getRandom(), origin);
+                } catch (Exception e) {
+                    LOGGER.warn("Decoration failed: {}", e.getMessage());
+                }
+            }
+        }*/
+        super.applyBiomeDecoration(level, chunk, structureManager);
     }
 
     @Override
     public void spawnOriginalMobs(WorldGenRegion region) {
-        // No initial mob spawning
+        net.minecraft.world.level.NaturalSpawner.spawnMobsForChunkGeneration(
+                region, region.getBiome(region.getCenter().getWorldPosition()), region.getCenter(), region.getRandom()
+        );
     }
 
     @Override

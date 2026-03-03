@@ -119,13 +119,14 @@ public class SuperflatChunkGenerator extends NoiseBasedChunkGenerator {
     }
 
     @Override
-    public void buildSurface(RandomState randomState, StructureManager structureManager, ChunkAccess chunk) {
+    public void buildSurface(net.minecraft.server.level.WorldGenRegion region, StructureManager structureManager, RandomState randomState, ChunkAccess chunk) {
         // No-op: we place our own grass/dirt in fillFromNoise
     }
 
     @Override
-    public void applyCarvers(RandomState randomState, long seed, net.minecraft.world.level.biome.BiomeManager biomeManager,
-                              StructureManager structureManager, ChunkAccess chunk, net.minecraft.world.level.levelgen.GenerationStep.Carving carving) {
+    public void applyCarvers(net.minecraft.server.level.WorldGenRegion region, long seed, RandomState randomState,
+                              net.minecraft.world.level.biome.BiomeManager biomeManager, StructureManager structureManager,
+                              ChunkAccess chunk, net.minecraft.world.level.levelgen.GenerationStep.Carving carving) {
         // No-op: no caves in superflat
     }
 

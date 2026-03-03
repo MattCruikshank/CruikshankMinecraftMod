@@ -5,6 +5,8 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.WallTorchBlock;
@@ -23,11 +25,23 @@ public class SpellHandler {
     @SubscribeEvent
     public void onChat(ServerChatEvent event) {
         String message = event.getRawText().trim();
-        if (message.equalsIgnoreCase("lumos")) {
-            handleLumos(event.getPlayer());
-        } else if (message.equalsIgnoreCase("nox")) {
-            handleNox(event.getPlayer());
+        if (message.equalsIgnoreCase("lumos") || message.equalsIgnoreCase("nox")) {
+            ServerPlayer player = event.getPlayer();
+            if (!isHoldingStick(player)) {
+                LOGGER.info("CRUIKSHANK: {} cast attempted but no stick held", message);
+                return;
+            }
+            if (message.equalsIgnoreCase("lumos")) {
+                handleLumos(player);
+            } else {
+                handleNox(player);
+            }
         }
+    }
+
+    private boolean isHoldingStick(ServerPlayer player) {
+        return player.getItemInHand(InteractionHand.MAIN_HAND).is(Items.STICK)
+                || player.getItemInHand(InteractionHand.OFF_HAND).is(Items.STICK);
     }
 
     private BlockHitResult raycast(ServerPlayer player) {

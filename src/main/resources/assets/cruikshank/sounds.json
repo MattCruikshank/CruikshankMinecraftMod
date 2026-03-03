@@ -1,0 +1,10 @@
+{
+  "golden": {
+    "sounds": [
+      {
+        "name": "cruikshank:golden",
+        "stream": true
+      }
+    ]
+  }
+}

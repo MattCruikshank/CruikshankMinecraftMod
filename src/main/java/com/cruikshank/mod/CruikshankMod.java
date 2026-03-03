@@ -1,5 +1,6 @@
 package com.cruikshank.mod;
 
+import com.cruikshank.mod.sound.ModSounds;
 import com.cruikshank.mod.world.CruikshankFlatChunkGenerator;
 import com.cruikshank.mod.world.LosAngelesChunkGenerator;
 import com.cruikshank.mod.world.SuperflatChunkGenerator;
@@ -9,6 +10,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.RecordItem;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraftforge.api.distmarker.Dist;
@@ -22,6 +24,7 @@ import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.RegistryObject;
 import org.slf4j.Logger;
 
 @Mod(CruikshankMod.MODID)
@@ -36,6 +39,9 @@ public class CruikshankMod
 
     public static final DeferredRegister<Codec<? extends ChunkGenerator>> CHUNK_GENERATORS =
             DeferredRegister.create(Registries.CHUNK_GENERATOR, MODID);
+
+    public static final RegistryObject<Item> GOLDEN_MUSIC_DISC = ITEMS.register("golden_music_disc",
+            () -> new RecordItem(6, ModSounds.GOLDEN, new Item.Properties().stacksTo(1), 3841));
 
     static {
         CHUNK_GENERATORS.register("cruikshank_flat", () -> CruikshankFlatChunkGenerator.CODEC);
@@ -56,6 +62,8 @@ public class CruikshankMod
         MinecraftForge.EVENT_BUS.register(this);
 
         CHUNK_GENERATORS.register(modEventBus);
+
+        ModSounds.SOUND_EVENTS.register(modEventBus);
     }
 
     private void commonSetup(final FMLCommonSetupEvent event)

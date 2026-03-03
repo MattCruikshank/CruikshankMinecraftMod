@@ -23,22 +23,27 @@ public class SpellHandler {
     @SubscribeEvent
     public void onChat(ServerChatEvent event) {
         String message = event.getRawText().trim();
-        if (!message.equalsIgnoreCase("lumos")) {
-            return;
+        if (message.equalsIgnoreCase("lumos")) {
+            handleLumos(event.getPlayer());
+        } else if (message.equalsIgnoreCase("nox")) {
+            handleNox(event.getPlayer());
         }
+    }
 
-        ServerPlayer player = event.getPlayer();
-        ServerLevel level = player.serverLevel();
-
+    private BlockHitResult raycast(ServerPlayer player) {
         Vec3 eyePos = player.getEyePosition();
         Vec3 lookEnd = eyePos.add(player.getLookAngle().scale(200));
-
-        BlockHitResult hitResult = level.clip(new ClipContext(
+        return player.serverLevel().clip(new ClipContext(
                 eyePos, lookEnd,
                 ClipContext.Block.OUTLINE,
                 ClipContext.Fluid.NONE,
                 player
         ));
+    }
+
+    private void handleLumos(ServerPlayer player) {
+        ServerLevel level = player.serverLevel();
+        BlockHitResult hitResult = raycast(player);
 
         if (hitResult.getType() == HitResult.Type.MISS) {
             LOGGER.info("CRUIKSHANK: Lumos — looking at sky, no torch placed");
@@ -68,5 +73,28 @@ public class SpellHandler {
 
         level.setBlockAndUpdate(targetPos, torchState);
         LOGGER.info("CRUIKSHANK: Lumos! Torch placed at {} on {} face", targetPos, face);
+    }
+
+    private void handleNox(ServerPlayer player) {
+        ServerLevel level = player.serverLevel();
+        BlockHitResult hitResult = raycast(player);
+
+        if (hitResult.getType() == HitResult.Type.MISS) {
+            LOGGER.info("CRUIKSHANK: Nox — looking at sky, nothing to remove");
+            return;
+        }
+
+        BlockPos pos = hitResult.getBlockPos();
+        BlockState state = level.getBlockState(pos);
+
+        if (state.is(Blocks.LAVA)) {
+            LOGGER.info("CRUIKSHANK: Nox — lava is excluded, not removing");
+            return;
+        }
+
+        if (state.getLightEmission(level, pos) > 0) {
+            level.removeBlock(pos, false);
+            LOGGER.info("CRUIKSHANK: Nox! Removed {} at {}", state.getBlock(), pos);
+        }
     }
 }

@@ -3,8 +3,9 @@
   "generator": {
     "type": "cruikshank:cruikshank_flat",
     "biome_source": {
-      "type": "minecraft:fixed",
-      "biome": "minecraft:plains"
-    }
+      "type": "minecraft:multi_noise",
+      "preset": "minecraft:overworld"
+    },
+    "settings": "minecraft:overworld"
   }
 }

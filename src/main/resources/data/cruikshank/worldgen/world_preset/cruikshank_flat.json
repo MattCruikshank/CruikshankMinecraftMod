@@ -6,8 +6,9 @@
         "type": "cruikshank:cruikshank_flat",
         "biome_source": {
           "type": "minecraft:multi_noise",
-          "biome": "minecraft:overworld"
-        }
+          "preset": "minecraft:overworld"
+        },
+        "settings": "minecraft:overworld"
       }
     },
     "minecraft:the_nether": {

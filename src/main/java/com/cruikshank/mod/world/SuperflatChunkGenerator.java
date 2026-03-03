@@ -51,7 +51,7 @@ public class SuperflatChunkGenerator extends NoiseBasedChunkGenerator {
             new Layer(Blocks.BONE_BLOCK, 2),
             new Layer(Blocks.IRON_BLOCK, 2),
             new Layer(Blocks.COAL_BLOCK, 2),
-            new Layer(Blocks.STONE, 40),
+            new Layer(Blocks.STONE, 103),
             new Layer(Blocks.DIRT, 4),
             new Layer(Blocks.GRASS_BLOCK, 1)
     );

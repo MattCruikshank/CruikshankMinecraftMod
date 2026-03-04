@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "up": "minecraft:block/emerald_block",
+    "down": "minecraft:block/emerald_block",
+    "north": "minecraft:block/raw_iron_block",
+    "south": "minecraft:block/emerald_block",
+    "east": "minecraft:block/emerald_block",
+    "west": "minecraft:block/emerald_block",
+    "particle": "minecraft:block/emerald_block"
+  }
+}

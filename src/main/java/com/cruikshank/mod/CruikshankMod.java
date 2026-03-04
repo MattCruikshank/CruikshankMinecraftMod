@@ -111,6 +111,11 @@ public class CruikshankMod
     public void onServerStarting(ServerStartingEvent event)
     {
         LOGGER.info("CRUIKSHANK: server starting");
+        ServerLevel overworld = event.getServer().getLevel(Level.OVERWORLD);
+        if (overworld != null && overworld.getChunkSource().getGenerator() instanceof SkyCruikshankChunkGenerator) {
+            overworld.setDefaultSpawnPos(new BlockPos(1, 71, 3), 0.0F);
+            LOGGER.info("CRUIKSHANK: set Sky Cruikshank spawn to island");
+        }
     }
 
     private static final String TUNNELS_PICKAXE_TAG = "cruikshank_tunnels_pickaxe";

@@ -5,17 +5,24 @@ import com.cruikshank.mod.spell.SpellHandler;
 import com.cruikshank.mod.world.CruikshankFlatChunkGenerator;
 import com.cruikshank.mod.world.LosAngelesChunkGenerator;
 import com.cruikshank.mod.world.SuperflatChunkGenerator;
+import com.cruikshank.mod.world.TunnelsChunkGenerator;
 import com.mojang.logging.LogUtils;
 import com.mojang.serialization.Codec;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.RecordItem;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -48,6 +55,7 @@ public class CruikshankMod
         CHUNK_GENERATORS.register("cruikshank_flat", () -> CruikshankFlatChunkGenerator.CODEC);
         CHUNK_GENERATORS.register("superflat_1", () -> SuperflatChunkGenerator.CODEC);
         CHUNK_GENERATORS.register("los_angeles", () -> LosAngelesChunkGenerator.CODEC);
+        CHUNK_GENERATORS.register("tunnels", () -> TunnelsChunkGenerator.CODEC);
     }
 
     public CruikshankMod(FMLJavaModLoadingContext context)
@@ -77,6 +85,28 @@ public class CruikshankMod
     public void onServerStarting(ServerStartingEvent event)
     {
         LOGGER.info("CRUIKSHANK: server starting");
+    }
+
+    private static final String TUNNELS_PICKAXE_TAG = "cruikshank_tunnels_pickaxe";
+
+    @SubscribeEvent
+    public void onPlayerLoggedIn(PlayerEvent.PlayerLoggedInEvent event)
+    {
+        var player = event.getEntity();
+        ServerLevel overworld = player.getServer().getLevel(Level.OVERWORLD);
+        if (overworld == null) return;
+
+        ChunkGenerator generator = overworld.getChunkSource().getGenerator();
+        if (!(generator instanceof TunnelsChunkGenerator)) return;
+
+        CompoundTag persisted = player.getPersistentData().getCompound(net.minecraft.world.entity.player.Player.PERSISTED_NBT_TAG);
+        if (persisted.getBoolean(TUNNELS_PICKAXE_TAG)) return;
+
+        persisted.putBoolean(TUNNELS_PICKAXE_TAG, true);
+        player.getPersistentData().put(net.minecraft.world.entity.player.Player.PERSISTED_NBT_TAG, persisted);
+
+        player.getInventory().add(new ItemStack(Items.IRON_PICKAXE));
+        LOGGER.info("CRUIKSHANK: gave iron pickaxe to {} (Tunnels world)", player.getName().getString());
     }
 
     @Mod.EventBusSubscriber(modid = MODID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)

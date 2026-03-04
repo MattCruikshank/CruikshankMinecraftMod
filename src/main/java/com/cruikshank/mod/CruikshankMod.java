@@ -167,7 +167,7 @@ public class CruikshankMod
         if (wolf.isFood(player.getItemInHand(event.getHand())) && wolf.getHealth() < wolf.getMaxHealth()) {
             wolf.level().playSound(null, wolf.getX(), wolf.getY(), wolf.getZ(),
                     ModSounds.WOLF_FEED.get(), SoundSource.NEUTRAL, 1.0F, 1.0F);
-        } else if (!wolf.isFood(player.getItemInHand(event.getHand()))) {
+        } else if (!wolf.isFood(player.getItemInHand(event.getHand())) && !wolf.isInSittingPose()) {
             wolf.level().playSound(null, wolf.getX(), wolf.getY(), wolf.getZ(),
                     ModSounds.WOLF_TOLD_TO_SIT.get(), SoundSource.NEUTRAL, 1.0F, 1.0F);
         }

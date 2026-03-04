@@ -6,5 +6,12 @@
         "stream": true
       }
     ]
+  },
+  "entity.wolf.tamed": {
+    "sounds": [
+      {
+        "name": "cruikshank:entity/wolf/tamed"
+      }
+    ]
   }
 }

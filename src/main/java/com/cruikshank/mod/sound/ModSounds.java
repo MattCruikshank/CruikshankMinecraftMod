@@ -15,4 +15,9 @@ public class ModSounds {
             SOUND_EVENTS.register("golden",
                     () -> SoundEvent.createVariableRangeEvent(
                             new ResourceLocation(CruikshankMod.MODID, "golden")));
+
+    public static final RegistryObject<SoundEvent> WOLF_TAMED =
+            SOUND_EVENTS.register("entity.wolf.tamed",
+                    () -> SoundEvent.createVariableRangeEvent(
+                            new ResourceLocation(CruikshankMod.MODID, "entity.wolf.tamed")));
 }

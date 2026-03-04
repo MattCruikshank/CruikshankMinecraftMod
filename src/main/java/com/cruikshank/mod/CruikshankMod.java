@@ -27,9 +27,12 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.chunk.ChunkGenerator;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.entity.animal.Wolf;
 import net.minecraft.world.level.material.MapColor;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.entity.living.AnimalTameEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerSetSpawnEvent;
 import net.minecraftforge.event.server.ServerStartingEvent;
@@ -138,6 +141,14 @@ public class CruikshankMod
         if (level.getBlockState(pos).getBlock() instanceof CotBlock) {
             event.setCanceled(true);
         }
+    }
+
+    @SubscribeEvent
+    public void onAnimalTamed(AnimalTameEvent event)
+    {
+        if (!(event.getAnimal() instanceof Wolf wolf)) return;
+        wolf.level().playSound(null, wolf.getX(), wolf.getY(), wolf.getZ(),
+                ModSounds.WOLF_TAMED.get(), SoundSource.NEUTRAL, 1.0F, 1.0F);
     }
 
     @Mod.EventBusSubscriber(modid = MODID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)

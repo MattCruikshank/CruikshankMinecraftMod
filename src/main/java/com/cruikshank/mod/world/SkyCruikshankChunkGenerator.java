@@ -10,6 +10,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.NoiseColumn;
 import net.minecraft.world.level.StructureManager;
+import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.biome.BiomeSource;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
@@ -20,7 +21,6 @@ import net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator;
 import net.minecraft.world.level.levelgen.NoiseGeneratorSettings;
 import net.minecraft.world.level.levelgen.RandomState;
 import net.minecraft.world.level.levelgen.blending.Blender;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.ChestBlockEntity;
 import org.slf4j.Logger;
 
@@ -47,14 +47,14 @@ public class SkyCruikshankChunkGenerator extends NoiseBasedChunkGenerator {
     private static final BlockState DIRT = Blocks.DIRT.defaultBlockState();
     private static final BlockState OAK_LOG = Blocks.OAK_LOG.defaultBlockState();
     private static final BlockState OAK_LEAVES = Blocks.OAK_LEAVES.defaultBlockState();
-    private static final BlockState CHEST = Blocks.CHEST.defaultBlockState();
+    private static final BlockState CHEST_STATE = Blocks.CHEST.defaultBlockState();
 
-    // L-shaped island blocks (x, z) — vertical arm + horizontal arm
-    // Vertical arm: x=0..2, z=0..4
-    // Horizontal arm: x=3..6, z=3..4
+    // L-shaped island blocks (x, z)
+    // Vertical arm: x=0..2, z=0..5
+    // Horizontal arm: x=3..6, z=3..5
     private static boolean isIsland(int x, int z) {
-        return (x >= 0 && x <= 2 && z >= 0 && z <= 4)
-            || (x >= 3 && x <= 6 && z >= 3 && z <= 4);
+        return (x >= 0 && x <= 2 && z >= 0 && z <= 5)
+            || (x >= 3 && x <= 6 && z >= 3 && z <= 5);
     }
 
     public SkyCruikshankChunkGenerator(BiomeSource biomeSource, Holder<NoiseGeneratorSettings> settings) {
@@ -100,8 +100,8 @@ public class SkyCruikshankChunkGenerator extends NoiseBasedChunkGenerator {
             chunk.setBlockState(pos, OAK_LOG, false);
         }
 
-        // Leaves: two 3x3 layers, then a 1x3 cross on top
-        int leafBase = trunkBase + trunkHeight - 2; // start leaves 2 below top of trunk
+        // Leaves: two 3x3 layers, then a cross on top
+        int leafBase = trunkBase + trunkHeight - 2;
         for (int dy = 0; dy <= 1; dy++) {
             for (int dx = -1; dx <= 1; dx++) {
                 for (int dz = -1; dz <= 1; dz++) {
@@ -115,7 +115,6 @@ public class SkyCruikshankChunkGenerator extends NoiseBasedChunkGenerator {
                 }
             }
         }
-        // Top cross
         int topY = leafBase + 2;
         for (int[] offset : new int[][]{{0,0}, {-1,0}, {1,0}, {0,-1}, {0,1}}) {
             int lx = treeX + offset[0];
@@ -125,15 +124,13 @@ public class SkyCruikshankChunkGenerator extends NoiseBasedChunkGenerator {
             chunk.setBlockState(pos, OAK_LEAVES, false);
         }
 
-        // Place chest at (5, ISLAND_Y+1, 4) with lava and water buckets
-        int chestX = 5, chestZ = 4;
-        pos.set(chestX, ISLAND_Y + 1, chestZ);
-        chunk.setBlockState(pos, CHEST, false);
-        BlockEntity be = chunk.getBlockEntity(pos);
-        if (be instanceof ChestBlockEntity chest) {
-            chest.setItem(0, new ItemStack(Items.LAVA_BUCKET));
-            chest.setItem(1, new ItemStack(Items.WATER_BUCKET));
-        }
+        // Place chest at (5, ISLAND_Y+1, 4) — block entity created explicitly
+        BlockPos chestPos = new BlockPos(5, ISLAND_Y + 1, 4);
+        chunk.setBlockState(chestPos, CHEST_STATE, false);
+        ChestBlockEntity chestEntity = new ChestBlockEntity(chestPos, CHEST_STATE);
+        chestEntity.setItem(0, new ItemStack(Items.LAVA_BUCKET));
+        chestEntity.setItem(1, new ItemStack(Items.WATER_BUCKET));
+        chunk.setBlockEntity(chestEntity);
 
         Heightmap.primeHeightmaps(chunk, EnumSet.allOf(Heightmap.Types.class));
         return CompletableFuture.completedFuture(chunk);
@@ -149,6 +146,11 @@ public class SkyCruikshankChunkGenerator extends NoiseBasedChunkGenerator {
                               net.minecraft.world.level.biome.BiomeManager biomeManager, StructureManager structureManager,
                               ChunkAccess chunk, net.minecraft.world.level.levelgen.GenerationStep.Carving carving) {
         // No-op
+    }
+
+    @Override
+    public void applyBiomeDecoration(WorldGenLevel level, ChunkAccess chunk, StructureManager structureManager) {
+        // No-op — suppress all features and structures
     }
 
     @Override

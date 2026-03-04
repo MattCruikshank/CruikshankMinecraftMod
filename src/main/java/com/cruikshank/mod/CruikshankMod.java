@@ -1,10 +1,6 @@
 package com.cruikshank.mod;
 
 import com.cruikshank.mod.block.CotBlock;
-import com.cruikshank.mod.block.EmeraldChestBlock;
-import com.cruikshank.mod.block.EmeraldChestBlockEntity;
-import com.cruikshank.mod.client.EmeraldGolemRenderer;
-import com.cruikshank.mod.entity.EmeraldGolem;
 import com.cruikshank.mod.sound.ModSounds;
 import com.cruikshank.mod.spell.SpellHandler;
 import com.cruikshank.mod.world.CruikshankFlatChunkGenerator;
@@ -20,8 +16,6 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.DyeColor;
@@ -31,9 +25,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.RecordItem;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.SoundType;
-import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.sounds.SoundSource;
@@ -42,16 +34,13 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.phys.AABB;
 import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
 import net.minecraftforge.event.entity.living.AnimalTameEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.entity.player.PlayerSetSpawnEvent;
 import net.minecraftforge.event.entity.player.PlayerSleepInBedEvent;
 import net.minecraftforge.event.entity.player.PlayerXpEvent;
-import net.minecraftforge.event.level.BlockEvent;
 import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -73,8 +62,6 @@ public class CruikshankMod
     public static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS, MODID);
     public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, MODID);
     public static final DeferredRegister<CreativeModeTab> CREATIVE_MODE_TABS = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, MODID);
-    public static final DeferredRegister<EntityType<?>> ENTITY_TYPES = DeferredRegister.create(ForgeRegistries.ENTITY_TYPES, MODID);
-    public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITY_TYPES = DeferredRegister.create(ForgeRegistries.BLOCK_ENTITY_TYPES, MODID);
 
     public static final DeferredRegister<Codec<? extends ChunkGenerator>> CHUNK_GENERATORS =
             DeferredRegister.create(Registries.CHUNK_GENERATOR, MODID);
@@ -88,29 +75,6 @@ public class CruikshankMod
 
     public static final RegistryObject<Item> GOLDEN_MUSIC_DISC = ITEMS.register("golden_music_disc",
             () -> new RecordItem(6, ModSounds.GOLDEN, new Item.Properties().stacksTo(1), 3841));
-
-    // Emerald Chest
-    public static final RegistryObject<Block> EMERALD_CHEST = BLOCKS.register("emerald_chest",
-            () -> new EmeraldChestBlock(BlockBehaviour.Properties.of()
-                    .mapColor(MapColor.EMERALD)
-                    .sound(SoundType.METAL)
-                    .strength(3.0F, 6.0F)
-                    .requiresCorrectToolForDrops()));
-
-    public static final RegistryObject<Item> EMERALD_CHEST_ITEM = ITEMS.register("emerald_chest",
-            () -> new BlockItem(EMERALD_CHEST.get(), new Item.Properties()));
-
-    public static final RegistryObject<BlockEntityType<EmeraldChestBlockEntity>> EMERALD_CHEST_BE =
-            BLOCK_ENTITY_TYPES.register("emerald_chest",
-                    () -> BlockEntityType.Builder.of(EmeraldChestBlockEntity::new, EMERALD_CHEST.get()).build(null));
-
-    // Emerald Golem
-    public static final RegistryObject<EntityType<EmeraldGolem>> EMERALD_GOLEM =
-            ENTITY_TYPES.register("emerald_golem",
-                    () -> EntityType.Builder.<EmeraldGolem>of(EmeraldGolem::new, MobCategory.MISC)
-                            .sized(0.6F, 1.1F)
-                            .clientTrackingRange(8)
-                            .build("emerald_golem"));
 
     static {
         CHUNK_GENERATORS.register("cruikshank_flat", () -> CruikshankFlatChunkGenerator.CODEC);
@@ -129,8 +93,6 @@ public class CruikshankMod
         BLOCKS.register(modEventBus);
         ITEMS.register(modEventBus);
         CREATIVE_MODE_TABS.register(modEventBus);
-        ENTITY_TYPES.register(modEventBus);
-        BLOCK_ENTITY_TYPES.register(modEventBus);
 
         MinecraftForge.EVENT_BUS.register(this);
         // MinecraftForge.EVENT_BUS.register(new SpellHandler());
@@ -153,38 +115,6 @@ public class CruikshankMod
         if (overworld != null && overworld.getChunkSource().getGenerator() instanceof SkyCruikshankChunkGenerator) {
             overworld.setDefaultSpawnPos(new BlockPos(1, 71, 3), 0.0F);
             LOGGER.info("CRUIKSHANK: set Sky Cruikshank spawn to island");
-        }
-    }
-
-    @SubscribeEvent
-    public void onBlockPlace(BlockEvent.EntityPlaceEvent event)
-    {
-        if (event.getEntity() == null || event.getEntity().level().isClientSide()) return;
-
-        BlockPos placedPos = event.getPos();
-        var level = (ServerLevel) event.getEntity().level();
-
-        // Check if carved pumpkin was placed on top of an emerald block
-        if (!event.getPlacedBlock().is(Blocks.CARVED_PUMPKIN)) return;
-
-        BlockPos belowPos = placedPos.below();
-        if (!level.getBlockState(belowPos).is(Blocks.EMERALD_BLOCK)) return;
-
-        LOGGER.info("CRUIKSHANK: Emerald Golem construction detected at {}", belowPos);
-
-        // Replace emerald block with emerald chest
-        level.setBlock(belowPos, EMERALD_CHEST.get().defaultBlockState(), 3);
-
-        // Remove the pumpkin
-        level.setBlock(placedPos, Blocks.AIR.defaultBlockState(), 3);
-
-        // Spawn the golem on top of the chest
-        EmeraldGolem golem = EMERALD_GOLEM.get().create(level);
-        if (golem != null) {
-            golem.setPos(belowPos.getX() + 0.5, belowPos.getY() + 1.0, belowPos.getZ() + 0.5);
-            golem.setChestPos(belowPos);
-            level.addFreshEntity(golem);
-            LOGGER.info("CRUIKSHANK: Spawned Emerald Golem at {}", golem.position());
         }
     }
 
@@ -295,22 +225,6 @@ public class CruikshankMod
         {
             LOGGER.info("CRUIKSHANK: CLIENT SETUP");
             LOGGER.info("MINECRAFT NAME >> {}", Minecraft.getInstance().getUser().getName());
-        }
-
-        @SubscribeEvent
-        public static void onRegisterRenderers(EntityRenderersEvent.RegisterRenderers event)
-        {
-            event.registerEntityRenderer(EMERALD_GOLEM.get(), EmeraldGolemRenderer::new);
-        }
-    }
-
-    @Mod.EventBusSubscriber(modid = MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
-    public static class ModEvents
-    {
-        @SubscribeEvent
-        public static void onEntityAttributeCreation(EntityAttributeCreationEvent event)
-        {
-            event.put(EMERALD_GOLEM.get(), EmeraldGolem.createAttributes().build());
         }
     }
 }

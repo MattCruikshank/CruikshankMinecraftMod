@@ -6,7 +6,5 @@
   "generator.cruikshank.sky_cruikshank": "Sky Cruikshank",
   "block.cruikshank.white_cot": "White Cot",
   "item.cruikshank.golden_music_disc": "Music Disc",
-  "item.cruikshank.golden_music_disc.desc": "Golden",
-  "block.cruikshank.emerald_chest": "Emerald Chest",
-  "entity.cruikshank.emerald_golem": "Emerald Golem"
+  "item.cruikshank.golden_music_disc.desc": "Golden"
 }

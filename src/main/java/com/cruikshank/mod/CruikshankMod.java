@@ -6,6 +6,7 @@ import com.cruikshank.mod.spell.SpellHandler;
 import com.cruikshank.mod.world.CruikshankFlatChunkGenerator;
 import com.cruikshank.mod.world.LosAngelesChunkGenerator;
 import com.cruikshank.mod.world.SuperflatChunkGenerator;
+import com.cruikshank.mod.world.SkyCruikshankChunkGenerator;
 import com.cruikshank.mod.world.TunnelsChunkGenerator;
 import com.mojang.logging.LogUtils;
 import com.mojang.serialization.Codec;
@@ -80,6 +81,7 @@ public class CruikshankMod
         CHUNK_GENERATORS.register("superflat_1", () -> SuperflatChunkGenerator.CODEC);
         CHUNK_GENERATORS.register("los_angeles", () -> LosAngelesChunkGenerator.CODEC);
         CHUNK_GENERATORS.register("tunnels", () -> TunnelsChunkGenerator.CODEC);
+        CHUNK_GENERATORS.register("sky_cruikshank", () -> SkyCruikshankChunkGenerator.CODEC);
     }
 
     public CruikshankMod(FMLJavaModLoadingContext context)

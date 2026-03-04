@@ -76,38 +76,43 @@ public class TunnelsChunkGenerator extends NoiseBasedChunkGenerator {
     private void carveTunnels(ChunkAccess chunk) {
         BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
 
+        int chunkX = chunk.getPos().x;
+        int chunkZ = chunk.getPos().z;
+
         // North-south tunnel: runs along z at local x=7..9
         for (int z = 0; z < 16; z++) {
-            // Use x=8 (center of tunnel) for surface detection
             int surfaceY = findSurfaceY(chunk, 8, z);
             int centerY = surfaceY - TUNNEL_DEPTH;
 
             for (int x = 8 - TUNNEL_HALF_WIDTH; x <= 8 + TUNNEL_HALF_WIDTH; x++) {
-                // Carve 3-tall air
                 for (int y = centerY - TUNNEL_HALF_WIDTH; y <= centerY + TUNNEL_HALF_WIDTH; y++) {
                     pos.set(x, y, z);
                     chunk.setBlockState(pos, AIR, false);
                 }
-                // Glowstone ceiling
-                pos.set(x, centerY + TUNNEL_HALF_WIDTH + 1, z);
+            }
+            // Single glowstone at center (x=8) every 16 blocks along z
+            int worldZ = chunkZ * 16 + z;
+            if (worldZ % 16 == 0) {
+                pos.set(8, centerY + TUNNEL_HALF_WIDTH + 1, z);
                 chunk.setBlockState(pos, GLOWSTONE, false);
             }
         }
 
         // East-west tunnel: runs along x at local z=7..9
         for (int x = 0; x < 16; x++) {
-            // Use z=8 (center of tunnel) for surface detection
             int surfaceY = findSurfaceY(chunk, x, 8);
             int centerY = surfaceY - TUNNEL_DEPTH;
 
             for (int z = 8 - TUNNEL_HALF_WIDTH; z <= 8 + TUNNEL_HALF_WIDTH; z++) {
-                // Carve 3-tall air
                 for (int y = centerY - TUNNEL_HALF_WIDTH; y <= centerY + TUNNEL_HALF_WIDTH; y++) {
                     pos.set(x, y, z);
                     chunk.setBlockState(pos, AIR, false);
                 }
-                // Glowstone ceiling
-                pos.set(x, centerY + TUNNEL_HALF_WIDTH + 1, z);
+            }
+            // Single glowstone at center (z=8) every 16 blocks along x
+            int worldX = chunkX * 16 + x;
+            if (worldX % 16 == 0) {
+                pos.set(x, centerY + TUNNEL_HALF_WIDTH + 1, 8);
                 chunk.setBlockState(pos, GLOWSTONE, false);
             }
         }

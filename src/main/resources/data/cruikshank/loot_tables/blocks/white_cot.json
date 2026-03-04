@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "cruikshank:white_cot"
+        }
+      ],
+      "conditions": [
+        {
+          "condition": "minecraft:block_state_property",
+          "block": "cruikshank:white_cot",
+          "properties": {
+            "part": "head"
+          }
+        }
+      ]
+    }
+  ]
+}

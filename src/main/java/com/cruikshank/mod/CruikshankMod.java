@@ -1,5 +1,6 @@
 package com.cruikshank.mod;
 
+import com.cruikshank.mod.block.CotBlock;
 import com.cruikshank.mod.sound.ModSounds;
 import com.cruikshank.mod.spell.SpellHandler;
 import com.cruikshank.mod.world.CruikshankFlatChunkGenerator;
@@ -9,20 +10,28 @@ import com.cruikshank.mod.world.TunnelsChunkGenerator;
 import com.mojang.logging.LogUtils;
 import com.mojang.serialization.Codec;
 import net.minecraft.client.Minecraft;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.RecordItem;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.chunk.ChunkGenerator;
+import net.minecraft.world.level.material.MapColor;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.player.PlayerEvent;
+import net.minecraftforge.event.entity.player.PlayerSetSpawnEvent;
 import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -47,6 +56,13 @@ public class CruikshankMod
 
     public static final DeferredRegister<Codec<? extends ChunkGenerator>> CHUNK_GENERATORS =
             DeferredRegister.create(Registries.CHUNK_GENERATOR, MODID);
+
+    public static final RegistryObject<Block> WHITE_COT = BLOCKS.register("white_cot",
+            () -> new CotBlock(DyeColor.WHITE,
+                    BlockBehaviour.Properties.of().mapColor(MapColor.WOOL).sound(SoundType.WOOL).strength(0.2F)));
+
+    public static final RegistryObject<Item> WHITE_COT_ITEM = ITEMS.register("white_cot",
+            () -> new BlockItem(WHITE_COT.get(), new Item.Properties()));
 
     public static final RegistryObject<Item> GOLDEN_MUSIC_DISC = ITEMS.register("golden_music_disc",
             () -> new RecordItem(6, ModSounds.GOLDEN, new Item.Properties().stacksTo(1), 3841));
@@ -107,6 +123,21 @@ public class CruikshankMod
 
         player.getInventory().add(new ItemStack(Items.IRON_PICKAXE));
         LOGGER.info("CRUIKSHANK: gave iron pickaxe to {} (Tunnels world)", player.getName().getString());
+    }
+
+    @SubscribeEvent
+    public void onPlayerSetSpawn(PlayerSetSpawnEvent event)
+    {
+        BlockPos pos = event.getNewSpawn();
+        if (pos == null) return;
+        if (!(event.getEntity() instanceof ServerPlayer serverPlayer)) return;
+
+        ServerLevel level = serverPlayer.server.getLevel(event.getSpawnLevel());
+        if (level == null) return;
+
+        if (level.getBlockState(pos).getBlock() instanceof CotBlock) {
+            event.setCanceled(true);
+        }
     }
 
     @Mod.EventBusSubscriber(modid = MODID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)

@@ -1,0 +1,45 @@
+{
+  "entity.wolf.ambient": {
+    "replace": true,
+    "sounds": [
+      {"name": "cruikshank:entity/wolf/ambient/i_am_a_good_dog"},
+      {"name": "cruikshank:entity/wolf/ambient/i_am_doing_nothing_right_now"},
+      {"name": "cruikshank:entity/wolf/bark/a_ball"},
+      {"name": "cruikshank:entity/wolf/bark/confused"}
+    ]
+  },
+  "entity.wolf.death": {
+    "replace": true,
+    "sounds": [
+      {"name": "cruikshank:entity/wolf/death/bad_feeling"},
+      {"name": "cruikshank:entity/wolf/death/goodbye"}
+    ]
+  },
+  "entity.wolf.growl": {
+    "replace": true,
+    "sounds": [
+      {"name": "cruikshank:entity/wolf/growl/i_can_smell_you"},
+      {"name": "cruikshank:entity/wolf/growl/i_do_not_like_squirrels"}
+    ]
+  },
+  "entity.wolf.hurt": {
+    "replace": true,
+    "sounds": [
+      {"name": "cruikshank:entity/wolf/hurt/this_is_not_good"}
+    ]
+  },
+  "entity.wolf.pant": {
+    "replace": true,
+    "sounds": [
+      {"name": "cruikshank:entity/wolf/pant/i_ran"},
+      {"name": "cruikshank:entity/wolf/pant/i_wag_my_tail_for_you"},
+      {"name": "cruikshank:entity/wolf/pant/let_us_go_this_way"}
+    ]
+  },
+  "entity.wolf.whine": {
+    "replace": true,
+    "sounds": [
+      {"name": "cruikshank:entity/wolf/whine/this_is_not_good"}
+    ]
+  }
+}

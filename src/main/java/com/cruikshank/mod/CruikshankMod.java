@@ -29,12 +29,17 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.animal.Wolf;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.material.MapColor;
+import net.minecraft.world.phys.AABB;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.living.AnimalTameEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
+import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.entity.player.PlayerSetSpawnEvent;
+import net.minecraftforge.event.entity.player.PlayerSleepInBedEvent;
+import net.minecraftforge.event.entity.player.PlayerXpEvent;
 import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -149,6 +154,60 @@ public class CruikshankMod
         if (!(event.getAnimal() instanceof Wolf wolf)) return;
         wolf.level().playSound(null, wolf.getX(), wolf.getY(), wolf.getZ(),
                 ModSounds.WOLF_TAMED.get(), SoundSource.NEUTRAL, 1.0F, 1.0F);
+    }
+
+    @SubscribeEvent
+    public void onEntityInteract(PlayerInteractEvent.EntityInteract event)
+    {
+        if (event.getEntity().level().isClientSide()) return;
+        if (!(event.getTarget() instanceof Wolf wolf)) return;
+        if (!wolf.isTame() || !wolf.isOwnedBy(event.getEntity())) return;
+
+        Player player = event.getEntity();
+        if (wolf.isFood(player.getItemInHand(event.getHand())) && wolf.getHealth() < wolf.getMaxHealth()) {
+            wolf.level().playSound(null, wolf.getX(), wolf.getY(), wolf.getZ(),
+                    ModSounds.WOLF_FEED.get(), SoundSource.NEUTRAL, 1.0F, 1.0F);
+        } else if (!wolf.isFood(player.getItemInHand(event.getHand()))) {
+            wolf.level().playSound(null, wolf.getX(), wolf.getY(), wolf.getZ(),
+                    ModSounds.WOLF_TOLD_TO_SIT.get(), SoundSource.NEUTRAL, 1.0F, 1.0F);
+        }
+    }
+
+    private static final double WOLF_HEAR_RANGE = 24.0;
+
+    @SubscribeEvent
+    public void onPlayerLevelUp(PlayerXpEvent.LevelChange event)
+    {
+        if (event.getEntity().level().isClientSide()) return;
+        if (event.getLevels() <= 0) return;
+
+        Player player = event.getEntity();
+        AABB area = player.getBoundingBox().inflate(WOLF_HEAR_RANGE);
+        var wolves = player.level().getEntitiesOfClass(Wolf.class, area,
+                w -> w.isTame() && w.isOwnedBy(player));
+
+        if (!wolves.isEmpty()) {
+            Wolf wolf = wolves.get(player.level().random.nextInt(wolves.size()));
+            wolf.level().playSound(null, wolf.getX(), wolf.getY(), wolf.getZ(),
+                    ModSounds.WOLF_NEARBY_PLAYER_LEVEL_UP.get(), SoundSource.NEUTRAL, 1.0F, 1.0F);
+        }
+    }
+
+    @SubscribeEvent
+    public void onPlayerSleep(PlayerSleepInBedEvent event)
+    {
+        if (event.getEntity().level().isClientSide()) return;
+
+        Player player = event.getEntity();
+        AABB area = player.getBoundingBox().inflate(WOLF_HEAR_RANGE);
+        var wolves = player.level().getEntitiesOfClass(Wolf.class, area,
+                w -> w.isTame() && w.isOwnedBy(player));
+
+        if (!wolves.isEmpty()) {
+            Wolf wolf = wolves.get(player.level().random.nextInt(wolves.size()));
+            wolf.level().playSound(null, wolf.getX(), wolf.getY(), wolf.getZ(),
+                    ModSounds.WOLF_NEARBY_PLAYER_SLEEP.get(), SoundSource.NEUTRAL, 1.0F, 1.0F);
+        }
     }
 
     @Mod.EventBusSubscriber(modid = MODID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)

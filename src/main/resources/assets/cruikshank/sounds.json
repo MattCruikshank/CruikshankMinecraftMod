@@ -9,9 +9,41 @@
   },
   "entity.wolf.tamed": {
     "sounds": [
-      {
-        "name": "cruikshank:entity/wolf/tamed"
-      }
+      {"name": "cruikshank:entity/wolf/tamed"},
+      {"name": "cruikshank:entity/wolf/tamed/did_i_mention_that_i_love_you_because_i_do"},
+      {"name": "cruikshank:entity/wolf/tamed/doug"},
+      {"name": "cruikshank:entity/wolf/tamed/greatest_human"},
+      {"name": "cruikshank:entity/wolf/tamed/i_am_here_to_help_you"},
+      {"name": "cruikshank:entity/wolf/tamed/oh_boy_we_are_going_to_have_so_much_fun"}
+    ]
+  },
+  "entity.wolf.feed": {
+    "sounds": [
+      {"name": "cruikshank:entity/wolf/feed/do_you_have_bacon"},
+      {"name": "cruikshank:entity/wolf/feed/i_had_a_treat"},
+      {"name": "cruikshank:entity/wolf/feed/oh_please_find_something_to_throw"}
+    ]
+  },
+  "entity.wolf.told_to_sit": {
+    "sounds": [
+      {"name": "cruikshank:entity/wolf/told_to_sit/will_i_stay_sitting"}
+    ]
+  },
+  "entity.wolf.nearby_player_level_up": {
+    "sounds": [
+      {"name": "cruikshank:entity/wolf/nearby_player_level_up/very_good"},
+      {"name": "cruikshank:entity/wolf/nearby_player_level_up/wagging_my_tail"},
+      {"name": "cruikshank:entity/wolf/nearby_player_level_up/well_done"},
+      {"name": "cruikshank:entity/wolf/nearby_player_level_up/you_are_great_at_doing_things"},
+      {"name": "cruikshank:entity/wolf/nearby_player_level_up/you_are_the_very_best"},
+      {"name": "cruikshank:entity/wolf/nearby_player_level_up/you_made_that_look_like_so_much_fun"}
+    ]
+  },
+  "entity.wolf.nearby_player_sleep": {
+    "sounds": [
+      {"name": "cruikshank:entity/wolf/nearby_player_sleep/time_for_a_nap"},
+      {"name": "cruikshank:entity/wolf/nearby_player_sleep/we_are_all_safe"},
+      {"name": "cruikshank:entity/wolf/nearby_player_sleep/when_i_go_to_sleep_sometimes"}
     ]
   }
 }

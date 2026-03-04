@@ -69,7 +69,7 @@ public class CruikshankMod
         CREATIVE_MODE_TABS.register(modEventBus);
 
         MinecraftForge.EVENT_BUS.register(this);
-        MinecraftForge.EVENT_BUS.register(new SpellHandler());
+        // MinecraftForge.EVENT_BUS.register(new SpellHandler());
 
         CHUNK_GENERATORS.register(modEventBus);
 
